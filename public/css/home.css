@@ -1,0 +1,25 @@
+body{
+    background : url('/img/landing.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Source Code Pro', monospace; 
+}
+h1{
+    padding-top:10%;
+    
+}
+h1,h4 {
+    color:white;
+    text-align: center;
+    font-size: 70px;
+}
+#benimButton{
+    text-align: center;
+    margin: 0 auto;
+    display: table;
+}
+p{
+    text-align:center;
+    color: white;
+    font-size: 40px;
+    margin-top: 15px;
+}
