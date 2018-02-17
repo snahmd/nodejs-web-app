@@ -95,13 +95,12 @@ app.post("/yemekler",kullaniciGirisi, function(req,res){
 
    //yeni yemek olustur ve db'ye kaydet
    Yemek.create(yeniYemek, function(err , yeniOlusturulmusYemek){
-    var currentUser = req.user;
+    
     if(err){
         console.log(err);
         res.redirect("/");
     }else{
-        currentUser.yemekler.push(yeniOlusturulmusYemek);
-        currentUser.save();
+        
         res.redirect("/yemekler");
     }
    });
@@ -146,7 +145,7 @@ app.put("/yemekler/:id", kullaniciGirisi, function(req, res){
 });
 
 //Yemek Silme
-app.delete("yemekler/:id", kullaniciGirisi, function(req,res){
+app.delete("/yemekler/:id", kullaniciGirisi, function(req,res){
     Yemek.findByIdAndRemove(req.params.id, function(err){
         if(err){
             console.log(err);
@@ -159,7 +158,13 @@ app.delete("yemekler/:id", kullaniciGirisi, function(req,res){
 
 //=========== USER ROUTE =================
 app.get("/user/:id/profile",kullaniciGirisi, function(req, res){
-    res.render("userProfile");
+    Yemek.find({}, function(err, yemeklerDB){
+        if(err){
+            console.log(err);
+        }
+        res.render("userProfile",{yemekler:yemeklerDB});
+    });
+    
 });
 
 //================YORUM ROUTE===================
@@ -190,6 +195,52 @@ app.post("/yemekler/:id/yorumlar",kullaniciGirisi , function(req, res){
         }
     });
 });
+//====================== ADMIN ROUTES ==================
+function generateID(){
+    var id = "";
+    var anahtarlar= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var uzunluk=100;
+    for (var i=0;i<uzunluk; i++){
+        id += anahtarlar.charAt(Math.floor(Math.random()* anahtarlar.length));
+        // console.log(i);
+        // console.log(Math.floor(Math.random()* anahtarlar.length));
+        // console.log(id);
+    }
+    return id;
+}
+
+
+app.get("/admin/validator", function(req,res){
+    res.render("admin/validator");
+});
+app.post("/admin/validator", function(req,res){
+    var secret = req.body.secret;
+    //console.log(secret);
+    if( secret == "nodejsogreniyorum"){
+        var retrievedID =generateID();
+        console.log(retrievedID);
+        app.set('id', retrievedID);
+        res.send(retrievedID);
+
+    }else {
+        console.log("Wrong Key");
+        res.redirect("/admin/validator");
+    }
+});
+
+app.get("/admin/giris", function(req,res){
+    res.render("admin/adminForm");
+});
+app.post("/admin/giris", function(req, res){
+    var adminID = req.body.id;
+    console.log(adminID);
+    if(app.get('id')== adminID){
+        User.find({}, (err, userDB)=> {
+            res.render("admin/infos", {users:userDB});
+        });
+    }
+});
+
 //====================== AUTH ROUTE ====================
 //kaydol
 app.get("/kaydol", function(req, res){
